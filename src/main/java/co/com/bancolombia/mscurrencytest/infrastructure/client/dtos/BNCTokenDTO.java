@@ -1,14 +1,15 @@
 package co.com.bancolombia.mscurrencytest.infrastructure.client.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import lombok.*;
 
 public class BNCTokenDTO {
 
-
     @Data
-    @Builder(toBuilder = true)
+    @Builder(toBuilder = true, builderClassName = "RequestGetTokenDTOBuilder")
+    @JsonDeserialize(builder = BNCTokenDTO.RequestGetTokenDTO.RequestGetTokenDTOBuilder.class)
     public static class RequestGetTokenDTO {
 
         private String audience;
@@ -17,19 +18,26 @@ public class BNCTokenDTO {
         @JsonProperty("grant_type")
         private String grantType;
 
+        @JsonPOJOBuilder(withPrefix = "")
+        public static class RequestGetTokenDTOBuilder {
+
+        }
+
     }
 
-    @Data
-    @Builder(toBuilder = true)
+    @Value
+    @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
+    @AllArgsConstructor
     public static class ResponseGetTokenDTO {
 
         @JsonProperty("access_token")
-        private String accessToken;
-        private String scope;
+        String accessToken;
+        String scope;
         @JsonProperty("expires_in")
-        private int expiresIn;
+        int expiresIn;
         @JsonProperty("token_type")
-        private String tokenType;
+        String tokenType;
+
 
     }
 

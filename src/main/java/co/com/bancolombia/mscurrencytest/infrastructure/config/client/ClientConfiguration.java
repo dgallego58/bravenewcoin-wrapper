@@ -1,4 +1,4 @@
-package co.com.bancolombia.mscurrencytest.infrastructure.config;
+package co.com.bancolombia.mscurrencytest.infrastructure.config.client;
 
 import co.com.bancolombia.mscurrencytest.infrastructure.utils.Converter;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -22,13 +22,12 @@ public class ClientConfiguration {
         restTemplate.setMessageConverters(messageConverters());
         RestTemplateBuilder builder = new RestTemplateBuilder();
         builder.configure(restTemplate);
-        builder.setConnectTimeout(Duration.ofSeconds(5));
+        builder.setConnectTimeout(Duration.ofSeconds(15));
         builder.setReadTimeout(Duration.ofSeconds(15));
         return builder.build();
     }
 
     public List<HttpMessageConverter<?>> messageConverters() {
-
         List<HttpMessageConverter<?>> converters = new ArrayList<>();
         converters.add(new MappingJackson2HttpMessageConverter(Converter.configuredObjectMapper()));
         return converters;

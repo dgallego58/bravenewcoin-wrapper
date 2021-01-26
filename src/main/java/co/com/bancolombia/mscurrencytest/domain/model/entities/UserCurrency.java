@@ -22,6 +22,10 @@ public class UserCurrency {
     @JoinColumn(name = "currency_id_fk", foreignKey = @ForeignKey(name = "currency_pk_key"))
     private Currency currency;
 
+    //extra field if is favorite
+    @Column(name = "favorite", nullable = false)
+    private boolean favorite;
+
     public UserCurrency() {
         //jpa auto match
     }
@@ -32,8 +36,17 @@ public class UserCurrency {
         this.userCurrencyId = new UserCurrencyId(this.user.getId(), this.currency.getId());
     }
 
-    public static UserCurrency create(User user, Currency currency){
+    public static UserCurrency create(User user, Currency currency) {
         return new UserCurrency(user, currency);
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public UserCurrency setFavorite(boolean favorite) {
+        this.favorite = favorite;
+        return this;
     }
 
     public UserCurrencyId getUserCurrencyId() {

@@ -1,6 +1,6 @@
-package co.com.bancolombia.mscurrencytest.infrastructure.filter;
+package co.com.bancolombia.mscurrencytest.infrastructure.config.security.filter;
 
-import co.com.bancolombia.mscurrencytest.infrastructure.config.SecurityConstants;
+import co.com.bancolombia.mscurrencytest.infrastructure.config.security.SecurityConstants;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import org.springframework.http.HttpHeaders;

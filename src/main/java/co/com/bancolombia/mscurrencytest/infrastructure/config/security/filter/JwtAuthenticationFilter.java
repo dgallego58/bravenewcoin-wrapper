@@ -1,10 +1,10 @@
-package co.com.bancolombia.mscurrencytest.infrastructure.filter;
+package co.com.bancolombia.mscurrencytest.infrastructure.config.security.filter;
 
 import co.com.bancolombia.mscurrencytest.domain.model.entities.User;
+import co.com.bancolombia.mscurrencytest.infrastructure.service.LoginUserDetails;
 import co.com.bancolombia.mscurrencytest.infrastructure.utils.Converter;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -12,7 +12,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,8 +19,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static co.com.bancolombia.mscurrencytest.infrastructure.config.SecurityConstants.EXPIRATION_TIME;
-import static co.com.bancolombia.mscurrencytest.infrastructure.config.SecurityConstants.SECRET;
+import static co.com.bancolombia.mscurrencytest.infrastructure.config.security.SecurityConstants.EXPIRATION_TIME;
+import static co.com.bancolombia.mscurrencytest.infrastructure.config.security.SecurityConstants.SECRET;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -30,7 +29,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
-        setFilterProcessesUrl("/user/**");
+        setFilterProcessesUrl("/user/login");
 
     }
 
@@ -46,12 +45,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
         String token = JWT.create()
-                .withSubject(((User) authResult.getPrincipal()).getUsername())
+                .withSubject(((LoginUserDetails) authResult.getPrincipal()).getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(SECRET.getBytes(StandardCharsets.UTF_8)));
-        String body = ((User) authResult.getPrincipal()).getUsername() + " " + token;
+        String body = ((LoginUserDetails) authResult.getPrincipal()).getUsername() + " " + token;
 
         response.getWriter().write(body);
         response.getWriter().flush();

@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URISyntaxException;
-
 @RestController
 @RequestMapping(path = "/user")
 @RequiredArgsConstructor
@@ -24,6 +22,11 @@ public class UserController {
         return ResponseEntity.accepted().build();
     }
 
+/*    @PostMapping(path = "/login")
+    public ResponseEntity<String> loginUser(@RequestBody UserDTO userDTO) {
+        userRepository.saveUser(userDTO);
+        return ResponseEntity.accepted().build();
+    }*/
 
 
 }

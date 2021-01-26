@@ -1,4 +1,4 @@
-package co.com.bancolombia.mscurrencytest.infrastructure.config;
+package co.com.bancolombia.mscurrencytest.infrastructure.config.serialization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

@@ -1,4 +1,4 @@
-package co.com.bancolombia.mscurrencytest.infrastructure.config;
+package co.com.bancolombia.mscurrencytest.infrastructure.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

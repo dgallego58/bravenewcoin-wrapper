@@ -12,8 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class UserAdapterService implements UserRepository, UserDetailsService {
@@ -24,11 +22,12 @@ public class UserAdapterService implements UserRepository, UserDetailsService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveUser(UserDTO userDTO) {
-        String passwordEncoded = passwordEncoder.encode(userDTO.getPassword());
+        String encodedPass = passwordEncoder.encode(userDTO.getPassword());
         User user = new User().setUsername(userDTO.getUsername())
+                .setActive(true)
                 .setFirstname(userDTO.getFirstname())
                 .setLastname(userDTO.getLastname())
-                .setPassword(passwordEncoded);
+                .setPassword(encodedPass);
         jpaUserRepository.save(user);
     }
 

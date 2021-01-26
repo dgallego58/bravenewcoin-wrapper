@@ -34,10 +34,7 @@ public class User {
 
     private String role;
     private boolean active;
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "currency_id_fk", foreignKey = @ForeignKey(name = "currency_id_key"))
-    private Currency favoriteCurrency;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+       @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserCurrency> userCurrencies;
 
     public String getRole() {
@@ -48,6 +45,7 @@ public class User {
         this.role = role;
         return this;
     }
+
 
     public boolean isActive() {
         return active;
@@ -144,12 +142,4 @@ public class User {
         return this;
     }
 
-    public Currency getFavoriteCurrency() {
-        return favoriteCurrency;
-    }
-
-    public User setFavoriteCurrency(Currency favoriteCurrency) {
-        this.favoriteCurrency = favoriteCurrency;
-        return this;
-    }
 }

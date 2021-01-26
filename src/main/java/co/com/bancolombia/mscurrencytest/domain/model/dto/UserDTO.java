@@ -1,17 +1,24 @@
 package co.com.bancolombia.mscurrencytest.domain.model.dto;
 
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder(toBuilder = true)
+@Builder(toBuilder = true, builderClassName = "UserDTOBuilder")
+@JsonDeserialize(builder = UserDTO.UserDTOBuilder.class)
 public class UserDTO {
 
     private String username;
-    private transient String password;
+    private String password;
     private String firstname;
     private String lastname;
-    private CurrencyDTO currencyDTO;
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class UserDTOBuilder {
+        //lombok and jackson serialization
+    }
 
 }
