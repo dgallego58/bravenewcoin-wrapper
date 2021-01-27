@@ -32,24 +32,15 @@ public class User {
     @Column(name = "lastname", nullable = false)
     private String lastname;
 
-    private String role;
     private boolean active;
-       @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserCurrency> userCurrencies;
-
-    public String getRole() {
-        return role;
-    }
-
-    public User setRole(String role) {
-        this.role = role;
-        return this;
-    }
 
 
     public boolean isActive() {
         return active;
     }
+
 
     public User setActive(boolean active) {
         this.active = active;
@@ -62,7 +53,6 @@ public class User {
     }
 
     public void removeCurrency(Currency currency) {
-
         for (UserCurrency userCurrency : this.getUserCurrencies()) {
             if (userCurrency.getUser().equals(this) && userCurrency.getCurrency().equals(currency)) {
                 userCurrency.setCurrency(null).setUser(null);

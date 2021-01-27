@@ -1,10 +1,7 @@
 package co.com.bancolombia.mscurrencytest.infrastructure.client;
 
 import co.com.bancolombia.mscurrencytest.infrastructure.client.constants.ClientConstants;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.AssetDTO;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.BNCTokenDTO;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.ContentGenericWrapper;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.MarketDTO;
+import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -41,6 +38,8 @@ public interface BNCService {
     ContentGenericWrapper<MarketDTO.MarketResponseDTO> getToMarket(MarketDTO request);
 
     ContentGenericWrapper<AssetDTO.AssetResponseDTO> getToAsset(AssetDTO.AssetRequestDTO request);
+
+    ContentGenericWrapper<AssetTickerResponse> getToAssetTicker(String assetId, boolean withPercentChange);
 
 
 }

@@ -1,4 +1,4 @@
-package co.com.bancolombia.mscurrencytest.infrastructure.service;
+package co.com.bancolombia.mscurrencytest.infrastructure.config.security;
 
 import co.com.bancolombia.mscurrencytest.domain.model.entities.User;
 import lombok.RequiredArgsConstructor;
@@ -6,19 +6,19 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 @RequiredArgsConstructor
-public class LoginUserDetails implements UserDetails {
+public class UserDetailsImpl implements UserDetails {
 
     private final User user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         //these lines just in case there are roles
-     /*   SimpleGrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getRole());
-        return List.of(grantedAuthority);*/
-        return Collections.emptyList();
+        // SimpleGrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getRole().name());
+        //return List.of(grantedAuthority);
+        return List.of();
     }
 
     @Override

@@ -9,7 +9,6 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -18,9 +17,7 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class BraveNewCoinClient implements BNCService {
 
-
     private final RestTemplate restTemplate;
-
 
     @Override
     public BNCTokenDTO.ResponseGetTokenDTO getToken(BNCTokenDTO.RequestGetTokenDTO requestGetTokenDTO) {
@@ -68,7 +65,6 @@ public class BraveNewCoinClient implements BNCService {
         if (request.getQuoteAssetId() != null && !request.getQuoteAssetId().isBlank()) {
             uriComponents.queryParam("quoteAssetId", request.getQuoteAssetId());
         }
-        UriComponents uriFormed = uriComponents.build();
         RequestEntity<Void> requestEntity = RequestEntity.get(uriComponents.build().toUri())
                 .headers(defaultHeader())
                 .build();
@@ -102,5 +98,19 @@ public class BraveNewCoinClient implements BNCService {
         return response.getBody();
     }
 
+    @Override
+    public ContentGenericWrapper<AssetTickerResponse> getToAssetTicker(String assetId, boolean withPercentChange) {
+        String uri = baseUrl.concat(String.format("%s", "market-cap"));
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(uri)
+                .queryParam("assetId", assetId)
+                .queryParam("percentChange", withPercentChange);
+        HttpHeaders httpHeaders = defaultHeader();
+        httpHeaders.setBearerAuth(getToken(defaultTokenDto()).getAccessToken());
+        ParameterizedTypeReference<ContentGenericWrapper<AssetTickerResponse>> typeReference = new ParameterizedTypeReference<>() {
+        };
+        RequestEntity<Void> request = RequestEntity.get(uriBuilder.build().toUri()).headers(httpHeaders).build();
+        ResponseEntity<ContentGenericWrapper<AssetTickerResponse>> response = restTemplate.exchange(request, typeReference);
 
+        return response.getBody();
+    }
 }

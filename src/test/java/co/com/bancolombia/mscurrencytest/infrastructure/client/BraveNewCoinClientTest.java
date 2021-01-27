@@ -1,10 +1,8 @@
 package co.com.bancolombia.mscurrencytest.infrastructure.client;
 
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.AssetDTO;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.BNCTokenDTO;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.ContentGenericWrapper;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.MarketDTO;
+import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
+@Disabled
 class BraveNewCoinClientTest {
 
     @Autowired
@@ -78,6 +77,66 @@ class BraveNewCoinClientTest {
             assertNotNull(assetById.getName());
             assertNotNull(marketId.getId());
         });
+    }
+
+    @Test
+    void getToAssetTickerTest() {
+        ContentGenericWrapper<AssetDTO.AssetResponseDTO> asset = bncService.getToAsset(createAssetRequest());
+        String assetId = asset.getContent()
+                .stream()
+                .findFirst()
+                .map(AssetDTO.AssetResponseDTO::getId)
+                .orElseThrow(NullPointerException::new);
+        ContentGenericWrapper<AssetTickerResponse> assetTickerResponseWithPercent = bncService.getToAssetTicker(assetId, true);
+        ContentGenericWrapper<AssetTickerResponse> assetTickerResponseNoPercent = bncService.getToAssetTicker(assetId, false);
+        System.out.println(assetTickerResponseWithPercent);
+        System.out.println(assetTickerResponseNoPercent);
+        assertAll(() -> {
+            assertNotNull(assetTickerResponseWithPercent.getContent()
+                    .stream()
+                    .findFirst()
+                    .map(AssetTickerResponse::getMarketCapPercentChange)
+                    .orElse(null));
+            assertNotNull(assetTickerResponseWithPercent.getContent()
+                    .stream()
+                    .findFirst()
+                    .map(AssetTickerResponse::getTotalMarketCapPercentChange)
+                    .orElse(null));
+            assertNotNull(assetTickerResponseWithPercent.getContent()
+                    .stream()
+                    .findFirst()
+                    .map(AssetTickerResponse::getVolumePercentChange)
+                    .orElse(null));
+            assertNotNull(assetTickerResponseWithPercent.getContent()
+                    .stream()
+                    .findFirst()
+                    .map(AssetTickerResponse::getPricePercentChange)
+                    .orElse(null));
+
+            assertNull(assetTickerResponseNoPercent.getContent()
+                    .stream()
+                    .findFirst()
+                    .map(AssetTickerResponse::getMarketCapPercentChange)
+                    .orElse(null));
+            assertNull(assetTickerResponseNoPercent.getContent()
+                    .stream()
+                    .findFirst()
+                    .map(AssetTickerResponse::getTotalMarketCapPercentChange)
+                    .orElse(null));
+            assertNull(assetTickerResponseNoPercent.getContent()
+                    .stream()
+                    .findFirst()
+                    .map(AssetTickerResponse::getVolumePercentChange)
+                    .orElse(null));
+            assertNull(assetTickerResponseNoPercent.getContent()
+                    .stream()
+                    .findFirst()
+                    .map(AssetTickerResponse::getPricePercentChange)
+                    .orElse(null));
+
+        });
+
+
     }
 
     private AssetDTO.AssetRequestDTO createAssetRequest() {

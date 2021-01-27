@@ -1,7 +1,6 @@
 package co.com.bancolombia.mscurrencytest.infrastructure.service;
 
 import co.com.bancolombia.mscurrencytest.domain.model.dto.UserDTO;
-import co.com.bancolombia.mscurrencytest.domain.model.gateway.UserRepository;
 import co.com.bancolombia.mscurrencytest.infrastructure.repository.JpaUserRepository;
 import co.com.bancolombia.mscurrencytest.infrastructure.utils.Converter;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,11 +20,11 @@ class UserAdapterServiceTest {
     @MockBean
     PasswordEncoder passwordEncoder;
 
-    UserRepository userRepository;
+    IUserGeneralService userRepository;
 
     @BeforeEach
     void setUp() {
-        userRepository = new UserAdapterService(jpaUserRepository, passwordEncoder);
+        userRepository = new UserGeneralService(jpaUserRepository, passwordEncoder);
     }
 
     @Test

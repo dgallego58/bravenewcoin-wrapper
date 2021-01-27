@@ -6,6 +6,9 @@ public class AbstractPercentChange {
     protected Double change7d;
     protected Double change30d;
 
+    public AbstractPercentChange() {
+        //serial
+    }
 
     public Double getChange24h() {
         return change24h;

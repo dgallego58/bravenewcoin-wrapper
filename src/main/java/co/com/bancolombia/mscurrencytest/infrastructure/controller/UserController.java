@@ -22,11 +22,5 @@ public class UserController {
         return ResponseEntity.accepted().build();
     }
 
-/*    @PostMapping(path = "/login")
-    public ResponseEntity<String> loginUser(@RequestBody UserDTO userDTO) {
-        userRepository.saveUser(userDTO);
-        return ResponseEntity.accepted().build();
-    }*/
-
 
 }
