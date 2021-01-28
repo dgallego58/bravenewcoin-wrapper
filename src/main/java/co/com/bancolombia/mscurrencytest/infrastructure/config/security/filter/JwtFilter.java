@@ -21,11 +21,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 
-public class JwtAuthorizationFilter extends OncePerRequestFilter {
+public class JwtFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
 
-    public JwtAuthorizationFilter(UserDetailsService userDetailsService) {
+    public JwtFilter(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 

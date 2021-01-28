@@ -1,7 +1,6 @@
 package co.com.bancolombia.mscurrencytest.infrastructure.config.security;
 
-import co.com.bancolombia.mscurrencytest.infrastructure.config.security.filter.JwtAuthenticationFilter;
-import co.com.bancolombia.mscurrencytest.infrastructure.config.security.filter.JwtAuthorizationFilter;
+import co.com.bancolombia.mscurrencytest.infrastructure.config.security.filter.JwtFilter;
 import co.com.bancolombia.mscurrencytest.infrastructure.service.IUserGeneralService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +28,7 @@ public class WebSecurityCustomConfiguration extends WebSecurityConfigurerAdapter
     private final IUserGeneralService iUserGeneralService;
     private final PasswordEncoder passwordEncoder;
 
+
     public WebSecurityCustomConfiguration(IUserGeneralService iUserGeneralService, PasswordEncoder passwordEncoder) {
         this.iUserGeneralService = iUserGeneralService;
         this.passwordEncoder = passwordEncoder;
@@ -38,10 +38,25 @@ public class WebSecurityCustomConfiguration extends WebSecurityConfigurerAdapter
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable();
-        http.authorizeRequests().mvcMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll().anyRequest().authenticated();
+        //sign Up access enabled to public
+        http.authorizeRequests()
+                .mvcMatchers(HttpMethod.POST, SIGN_UP_URL)
+                .permitAll()
+                .mvcMatchers(HttpMethod.POST, "/user/login")
+                .permitAll()
+                //swagger and open api
+                .mvcMatchers("/v3/api-docs/**")
+                .permitAll()
+                .mvcMatchers("/swagger-ui/**")
+                .permitAll()
+                .mvcMatchers("/swagger-ui.html")
+                .permitAll()
+                //any other request must be authenticated
+                .anyRequest()
+                .authenticated();
 
-        http.addFilterBefore(new JwtAuthorizationFilter(iUserGeneralService), UsernamePasswordAuthenticationFilter.class);
-        http.addFilter(new JwtAuthenticationFilter(authenticationManager()));
+        http.addFilterBefore(new JwtFilter(iUserGeneralService), UsernamePasswordAuthenticationFilter.class);
+        //http.addFilter(new JwtAuthenticationFilter(authenticationManager()));
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }

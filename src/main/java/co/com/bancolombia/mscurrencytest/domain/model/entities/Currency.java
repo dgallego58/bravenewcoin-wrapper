@@ -6,6 +6,7 @@ import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
@@ -30,8 +31,21 @@ public class Currency {
     private String symbol;
     @Column(name = "type", nullable = false)
     private String type;
-    @Column(name = "url", nullable = false)
-    private String url;
+    @Column(name = "price", nullable = false)
+    private BigDecimal price;
+
+    public Currency() {
+        //jpa mapper
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public Currency setPrice(BigDecimal price) {
+        this.price = price;
+        return this;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -40,13 +54,13 @@ public class Currency {
         if (o == null || getClass() != o.getClass())
             return false;
         Currency currency = (Currency) o;
-        return id.equals(currency.id) && apiIdentifier.equals(currency.apiIdentifier) && name.equals(currency.name) && status
-                .equals(currency.status) && symbol.equals(currency.symbol) && type.equals(currency.type) && url.equals(currency.url);
+        return apiIdentifier.equals(currency.apiIdentifier) && name.equals(currency.name) && status.equals(currency.status) && symbol
+                .equals(currency.symbol) && type.equals(currency.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, apiIdentifier, name, status, symbol, type, url);
+        return Objects.hash(apiIdentifier, name, status, symbol, type);
     }
 
     public Integer getId() {
@@ -103,12 +117,4 @@ public class Currency {
         return this;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public Currency setUrl(String url) {
-        this.url = url;
-        return this;
-    }
 }

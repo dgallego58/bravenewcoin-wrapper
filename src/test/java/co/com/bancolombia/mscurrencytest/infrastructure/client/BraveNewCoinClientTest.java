@@ -140,10 +140,7 @@ class BraveNewCoinClientTest {
     }
 
     private AssetDTO.AssetRequestDTO createAssetRequest() {
-        return AssetDTO.AssetRequestDTO.builder()
-                .status(AssetDTO.AssetStatus.ACTIVE)
-                .symbol("BTC")
-                .type(AssetDTO.AssetType.CRYPTO)
+        return AssetDTO.AssetRequestDTO.builder().status(AssetDTO.AssetStatus.ACTIVE).symbol("COP").type("FIAT")
                 .build();
     }
 

@@ -34,31 +34,29 @@ public class User {
 
     private boolean active;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserCurrency> userCurrencies;
-
+    private List<UserCurrency> userCurrencies = new ArrayList<>();
 
     public boolean isActive() {
         return active;
     }
-
 
     public User setActive(boolean active) {
         this.active = active;
         return this;
     }
 
-    public void addCurrency(Currency currency) {
-        UserCurrency userCurrency = UserCurrency.create(this, currency);
+    public void addCurrency(Currency currency, boolean favorite) {
+
+        UserCurrency userCurrency = new UserCurrency(this, currency, favorite);
         this.getUserCurrencies().add(userCurrency);
     }
 
     public void removeCurrency(Currency currency) {
         for (UserCurrency userCurrency : this.getUserCurrencies()) {
             if (userCurrency.getUser().equals(this) && userCurrency.getCurrency().equals(currency)) {
-                userCurrency.setCurrency(null).setUser(null);
+                userCurrency.setUser(null).setUser(null);
                 this.getUserCurrencies().remove(userCurrency);
             }
-
         }
     }
 
@@ -69,17 +67,17 @@ public class User {
         if (o == null || getClass() != o.getClass())
             return false;
         User user = (User) o;
-        return id.equals(user.id) && username.equals(user.username) && password.equals(user.password) && firstname.equals(user.firstname) && lastname
+        return active == user.active && username.equals(user.username) && password.equals(user.password) && firstname.equals(user.firstname) && lastname
                 .equals(user.lastname);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, password, firstname, lastname);
+        return Objects.hash(username, password, firstname, lastname, active);
     }
 
     public List<UserCurrency> getUserCurrencies() {
-        return userCurrencies == null ? new ArrayList<>() : userCurrencies;
+        return userCurrencies;
     }
 
     public User setUserCurrencies(List<UserCurrency> userCurrencies) {

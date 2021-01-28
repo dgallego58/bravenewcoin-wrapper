@@ -13,9 +13,10 @@ public class UserCurrency {
     @EmbeddedId
     private UserCurrencyId userCurrencyId;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("userId")
     @JoinColumn(name = "user_id_fk", foreignKey = @ForeignKey(name = "user_pk_key"))
+    @MapsId("userId")
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("currencyId")
@@ -30,23 +31,27 @@ public class UserCurrency {
         //jpa auto match
     }
 
-    public UserCurrency(User user, Currency currency) {
+    public UserCurrency(User user, Currency currency, boolean favorite) {
         this.user = user;
         this.currency = currency;
-        this.userCurrencyId = new UserCurrencyId(this.user.getId(), this.currency.getId());
-    }
-
-    public static UserCurrency create(User user, Currency currency) {
-        return new UserCurrency(user, currency);
-    }
-
-    public boolean isFavorite() {
-        return favorite;
-    }
-
-    public UserCurrency setFavorite(boolean favorite) {
         this.favorite = favorite;
-        return this;
+        this.userCurrencyId = new UserCurrencyId(user.getId(), currency.getId());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        UserCurrency that = (UserCurrency) o;
+        return favorite == that.favorite && userCurrencyId.equals(that.userCurrencyId) && user.equals(that.user) && currency
+                .equals(that.currency);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userCurrencyId, user, currency, favorite);
     }
 
     public UserCurrencyId getUserCurrencyId() {
@@ -76,18 +81,12 @@ public class UserCurrency {
         return this;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        UserCurrency that = (UserCurrency) o;
-        return userCurrencyId.equals(that.userCurrencyId) && user.equals(that.user) && currency.equals(that.currency);
+    public boolean isFavorite() {
+        return favorite;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(userCurrencyId, user, currency);
+    public UserCurrency setFavorite(boolean favorite) {
+        this.favorite = favorite;
+        return this;
     }
 }

@@ -80,17 +80,18 @@ public class BraveNewCoinClient implements BNCService {
 
         UriComponentsBuilder uriComponents = UriComponentsBuilder.fromHttpUrl(uri);
 
-        if (request.getSymbol() != null) {
+        if (!request.getSymbol().isEmpty()) {
             uriComponents.queryParam("symbol", request.getSymbol());
         }
         if (request.getStatus() != null) {
             uriComponents.queryParam("status", request.getStatus().getValue());
         }
-        if (request.getType() != null) {
-            uriComponents.queryParam("type", request.getType().getValue());
+        if (request.getType() != null && !request.getType().isEmpty()) {
+            uriComponents.queryParam("type", request.getType());
         }
         ParameterizedTypeReference<ContentGenericWrapper<AssetDTO.AssetResponseDTO>> typeReference = new ParameterizedTypeReference<>() {
         };
+        System.out.println("uri req: " + uriComponents.build().toUri());
         RequestEntity<Void> requestEntity = RequestEntity.get(uriComponents.build().toUri())
                 .headers(defaultHeader())
                 .build();

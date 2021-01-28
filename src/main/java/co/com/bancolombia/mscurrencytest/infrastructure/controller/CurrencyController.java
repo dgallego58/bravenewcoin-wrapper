@@ -1,30 +1,39 @@
 package co.com.bancolombia.mscurrencytest.infrastructure.controller;
 
-import co.com.bancolombia.mscurrencytest.infrastructure.config.security.utils.SessionJwt;
-import co.com.bancolombia.mscurrencytest.infrastructure.service.IUserGeneralService;
+import co.com.bancolombia.mscurrencytest.domain.model.dto.CurrencyDTO;
+import co.com.bancolombia.mscurrencytest.infrastructure.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import javax.validation.Valid;
+import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/currency")
 @RequiredArgsConstructor
 public class CurrencyController {
 
-    private final IUserGeneralService iUserGeneralService;
 
+    private final CurrencyService currencyService;
 
-    @GetMapping(path = "/salute", consumes = "application/json")
-    public ResponseEntity<String> sayHello(@RequestParam String sayHello) {
+    @GetMapping(path = "/getCoins", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CurrencyDTO>> getCoins() {
+        List<CurrencyDTO> response = currencyService.getUserCurrencies();
+        return ResponseEntity.ok(response);
+    }
 
-        String usrName = SessionJwt.loggedUsername();
-        UserDetails user = iUserGeneralService.loadUserByUsername(usrName);
-        return ResponseEntity.ok(user.getUsername() + " SALUDO : " + sayHello);
-
+    @PostMapping(path = "/addCoin", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> addCurrency(@RequestBody @Valid CurrencyDTO currencyDTO) {
+        currencyService.addCurrency(currencyDTO);
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/addCoin")
+                .buildAndExpand("/currency/user")
+                .toUri();
+        return ResponseEntity.created(location).build();
     }
 
 }

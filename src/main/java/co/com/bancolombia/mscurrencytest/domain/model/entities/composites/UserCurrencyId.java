@@ -1,9 +1,6 @@
 package co.com.bancolombia.mscurrencytest.domain.model.entities.composites;
 
-import co.com.bancolombia.mscurrencytest.domain.model.entities.Currency;
-import co.com.bancolombia.mscurrencytest.domain.model.entities.User;
-
-import javax.persistence.*;
+import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -15,7 +12,7 @@ public class UserCurrencyId implements Serializable {
     private Integer currencyId;
 
     public UserCurrencyId() {
-        //jpa requires for embedded objects
+        //jpa stuff
     }
 
     public UserCurrencyId(Integer userId, Integer currencyId) {
@@ -37,7 +34,6 @@ public class UserCurrencyId implements Serializable {
     public int hashCode() {
         return Objects.hash(userId, currencyId);
     }
-
 
     public Integer getUserId() {
         return userId;

@@ -1,12 +1,17 @@
 package co.com.bancolombia.mscurrencytest.infrastructure.service;
 
+import co.com.bancolombia.mscurrencytest.domain.model.dto.CurrencyDTO;
 import co.com.bancolombia.mscurrencytest.domain.model.gateway.CurrencyRepository;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.AssetDTO;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
 public interface CurrencyService extends CurrencyRepository {
 
-    List<AssetDTO.AssetResponseDTO> getCoinsFromApi(AssetDTO.AssetRequestDTO request);
+    List<CurrencyDTO> getUserCurrencies();
+
+    List<CurrencyDTO> getTop3(Sort sort);
+
+    void addCurrency(CurrencyDTO currencyDTO);
 
 }

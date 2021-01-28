@@ -8,21 +8,6 @@ import lombok.*;
 public class AssetDTO {
 
 
-    public enum AssetType {
-        @JsonProperty("FIAT") FIAT("FIAT"), @JsonProperty("CRYPTO") CRYPTO("CRYPTO");
-
-        private final String value;
-
-        AssetType(String value) {
-
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
     public enum AssetStatus {
         @JsonProperty("ACTIVE") ACTIVE("ACTIVE"), @JsonProperty("INACTIVE") INACTIVE("INACTIVE");
 
@@ -46,7 +31,7 @@ public class AssetDTO {
     public static class AssetRequestDTO {
         private String symbol;
         private AssetStatus status;
-        private AssetType type;
+        private String type;
 
         @JsonPOJOBuilder(withPrefix = "")
         public static class AssetRequestDTOBuilder {
