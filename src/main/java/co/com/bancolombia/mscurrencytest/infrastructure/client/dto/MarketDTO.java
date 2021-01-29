@@ -1,4 +1,4 @@
-package co.com.bancolombia.mscurrencytest.infrastructure.client.dtos;
+package co.com.bancolombia.mscurrencytest.infrastructure.client.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;

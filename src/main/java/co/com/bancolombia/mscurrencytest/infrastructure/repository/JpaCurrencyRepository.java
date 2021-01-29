@@ -1,15 +1,21 @@
 package co.com.bancolombia.mscurrencytest.infrastructure.repository;
 
+import co.com.bancolombia.mscurrencytest.domain.model.dto.CurrencyDTO;
 import co.com.bancolombia.mscurrencytest.domain.model.entities.Currency;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface JpaCurrencyRepository extends JpaRepository<Currency, Integer> {
 
-    Optional<Currency> findByApiIdentifier(String apiIdentifier);
+    Optional<Currency> findByAssetId(String apiIdentifier);
 
-    List<Currency> findByIdIn(List<Integer> ids);
+    @Query("select distinct c from Currency c" + " where" + " c.name like %:#{#currencyDTO.getName()}% or" + " c.symbol like :#{#currencyDTO.getSymbol()} or" + " c.type like :#{#currencyDTO.getType()} or " + " c.assetId like :#{#currencyDTO.getAssetId()}")
+    Optional<Currency> findByAssetId(@Param("currencyDTO") CurrencyDTO currencyDTO);
+
 
 }

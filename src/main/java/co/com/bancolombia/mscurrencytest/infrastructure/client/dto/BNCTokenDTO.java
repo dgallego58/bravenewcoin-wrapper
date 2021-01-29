@@ -1,4 +1,4 @@
-package co.com.bancolombia.mscurrencytest.infrastructure.client.dtos;
+package co.com.bancolombia.mscurrencytest.infrastructure.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -6,6 +6,10 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.*;
 
 public class BNCTokenDTO {
+
+    private BNCTokenDTO() {
+        //sonar
+    }
 
     @Data
     @Builder(toBuilder = true, builderClassName = "RequestGetTokenDTOBuilder")

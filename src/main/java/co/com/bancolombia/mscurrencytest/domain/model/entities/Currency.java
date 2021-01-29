@@ -1,37 +1,33 @@
 package co.com.bancolombia.mscurrencytest.domain.model.entities;
 
 import co.com.bancolombia.mscurrencytest.domain.model.constants.DatabaseNames;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.NaturalIdCache;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@NaturalIdCache
-@Table(name = "currency", schema = DatabaseNames.MAIN_SCHEMA)
-public class Currency {
+@Table(name = "currencies", schema = DatabaseNames.CRYPTO_SCHEMA)
+public class Currency implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "currency_seq")
-    @SequenceGenerator(name = "currency_seq", allocationSize = 5)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @NaturalId
-    @Column(name = "api_identifier")
-    private String apiIdentifier;
-    @Column(name = "name", nullable = false)
+    @Column(name = "asset_id")
+    private String assetId;
+    @Column(name = "name")
     private String name;
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     private String status;
-    @Column(name = "symbol", nullable = false)
+    @Column(name = "symbol")
     private String symbol;
-    @Column(name = "type", nullable = false)
+    @Column(name = "currency_type")
     private String type;
-    @Column(name = "price", nullable = false)
+    @Column(name = "price")
     private BigDecimal price;
 
     public Currency() {
@@ -47,6 +43,7 @@ public class Currency {
         return this;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -54,30 +51,30 @@ public class Currency {
         if (o == null || getClass() != o.getClass())
             return false;
         Currency currency = (Currency) o;
-        return apiIdentifier.equals(currency.apiIdentifier) && name.equals(currency.name) && status.equals(currency.status) && symbol
-                .equals(currency.symbol) && type.equals(currency.type);
+        return Objects.equals(assetId, currency.assetId) && Objects.equals(name, currency.name) && Objects.equals(status, currency.status) && Objects
+                .equals(symbol, currency.symbol) && Objects.equals(type, currency.type) && Objects.equals(price, currency.price);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(apiIdentifier, name, status, symbol, type);
+        return Objects.hash(assetId, name, status, symbol, type, price);
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public Currency setId(Integer id) {
+    public Currency setId(Long id) {
         this.id = id;
         return this;
     }
 
-    public String getApiIdentifier() {
-        return apiIdentifier;
+    public String getAssetId() {
+        return assetId;
     }
 
-    public Currency setApiIdentifier(String apiIdentifier) {
-        this.apiIdentifier = apiIdentifier;
+    public Currency setAssetId(String apiIdentifier) {
+        this.assetId = apiIdentifier;
         return this;
     }
 
@@ -116,5 +113,4 @@ public class Currency {
         this.type = type;
         return this;
     }
-
 }

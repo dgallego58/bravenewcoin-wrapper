@@ -4,6 +4,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public final class SessionJwt {
 
+    private SessionJwt() {
+        //sonar
+    }
+
     public static String loggedUsername() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }

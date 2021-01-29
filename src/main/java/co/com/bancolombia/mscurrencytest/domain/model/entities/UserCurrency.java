@@ -4,27 +4,28 @@ import co.com.bancolombia.mscurrencytest.domain.model.constants.DatabaseNames;
 import co.com.bancolombia.mscurrencytest.domain.model.entities.composites.UserCurrencyId;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "user_currency", schema = DatabaseNames.MAIN_SCHEMA)
-public class UserCurrency {
+@Table(name = "users_currencies", schema = DatabaseNames.MANAGER_SCHEMA)
+public class UserCurrency implements Serializable {
 
     @EmbeddedId
     private UserCurrencyId userCurrencyId;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id_fk", foreignKey = @ForeignKey(name = "user_pk_key"))
+    @JoinColumn(name = "user_id")
     @MapsId("userId")
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("currencyId")
-    @JoinColumn(name = "currency_id_fk", foreignKey = @ForeignKey(name = "currency_pk_key"))
+    @JoinColumn(name = "currency_id")
     private Currency currency;
 
     //extra field if is favorite
-    @Column(name = "favorite", nullable = false)
+    @Column(name = "favorite")
     private boolean favorite;
 
     public UserCurrency() {
@@ -38,6 +39,7 @@ public class UserCurrency {
         this.userCurrencyId = new UserCurrencyId(user.getId(), currency.getId());
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -45,17 +47,31 @@ public class UserCurrency {
         if (o == null || getClass() != o.getClass())
             return false;
         UserCurrency that = (UserCurrency) o;
-        return favorite == that.favorite && userCurrencyId.equals(that.userCurrencyId) && user.equals(that.user) && currency
-                .equals(that.currency);
+        return Objects.equals(user, that.user) && Objects.equals(currency, that.currency);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userCurrencyId, user, currency, favorite);
+        return Objects.hash(user, currency);
     }
 
     public UserCurrencyId getUserCurrencyId() {
         return userCurrencyId;
+    }
+
+
+    public User getUser() {
+        return user;
+    }
+
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+
+    public boolean isFavorite() {
+        return favorite;
     }
 
     public UserCurrency setUserCurrencyId(UserCurrencyId userCurrencyId) {
@@ -63,26 +79,14 @@ public class UserCurrency {
         return this;
     }
 
-    public User getUser() {
-        return user;
-    }
-
     public UserCurrency setUser(User user) {
         this.user = user;
         return this;
     }
 
-    public Currency getCurrency() {
-        return currency;
-    }
-
     public UserCurrency setCurrency(Currency currency) {
         this.currency = currency;
         return this;
-    }
-
-    public boolean isFavorite() {
-        return favorite;
     }
 
     public UserCurrency setFavorite(boolean favorite) {

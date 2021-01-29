@@ -1,20 +1,18 @@
 package co.com.bancolombia.mscurrencytest.infrastructure.service;
 
+import co.com.bancolombia.mscurrencytest.domain.exception.CurrencyNotFound;
 import co.com.bancolombia.mscurrencytest.domain.model.dto.CurrencyDTO;
 import co.com.bancolombia.mscurrencytest.domain.model.entities.Currency;
 import co.com.bancolombia.mscurrencytest.domain.model.entities.User;
 import co.com.bancolombia.mscurrencytest.domain.model.entities.UserCurrency;
-import co.com.bancolombia.mscurrencytest.domain.model.entities.composites.UserCurrencyId;
 import co.com.bancolombia.mscurrencytest.infrastructure.client.BNCService;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.AssetDTO;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.AssetTickerResponse;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.ContentGenericWrapper;
+import co.com.bancolombia.mscurrencytest.infrastructure.client.dto.AssetDTO;
+import co.com.bancolombia.mscurrencytest.infrastructure.client.dto.AssetTickerResponse;
 import co.com.bancolombia.mscurrencytest.infrastructure.config.security.utils.SessionJwt;
 import co.com.bancolombia.mscurrencytest.infrastructure.repository.JpaCurrencyRepository;
 import co.com.bancolombia.mscurrencytest.infrastructure.repository.JpaUserCurrencyRepository;
 import co.com.bancolombia.mscurrencytest.infrastructure.repository.JpaUserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,68 +25,77 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CurrencyServiceImpl implements CurrencyService {
 
-
     private final JpaCurrencyRepository jpaCurrencyRepository;
     private final JpaUserCurrencyRepository jpaUserCurrencyRepository;
     private final JpaUserRepository jpaUserRepository;
-
     private final BNCService bncService;
 
     @Override
     @Transactional(readOnly = true)
     public List<CurrencyDTO> getUserCurrencies() {
-        List<Integer> userCurrencies = jpaUserCurrencyRepository.findByUserUsername(SessionJwt.loggedUsername())
+        return jpaUserCurrencyRepository.findByUserUsername(SessionJwt.loggedUsername())
                 .stream()
-                .map(UserCurrency::getUserCurrencyId)
-                .map(UserCurrencyId::getUserId)
-                .collect(Collectors.toList());
-        return jpaCurrencyRepository.findByIdIn(userCurrencies)
-                .stream()
+                .map(this::currencyConverter)
                 .map(CurrencyDTO::mapToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<CurrencyDTO> getTop3(Sort sort) {
+    @Transactional(readOnly = true)
+    public List<CurrencyDTO> getTop3(boolean reversed) {
 
-  /*      List<Integer> userCurrencies = jpaUserCurrencyRepository.findCurrenciesIdsByUsername(SessionJwt.loggedUsername())
+        return jpaUserCurrencyRepository.findByUserUsername(SessionJwt.loggedUsername())
                 .stream()
-                .map(uc -> uc.getCurrency().getId())
+                .map(this::currencyConverter)
+                .sorted((c1, c2) -> reversed ? c1.getPrice().compareTo(c2.getPrice()) : c2.getPrice()
+                        .compareTo(c1.getPrice()))
+                .map(CurrencyDTO::mapToDto)
                 .collect(Collectors.toList());
-        return jpaCurrencyRepository.findAllById(userCurrencies)
-                .stream()
-                .map(currency -> CurrencyDTO.builder()
-                        .assetId(currency.getApiIdentifier())
-                        .symbol(currency.getSymbol())
-                        .type(currency.getType())
-                        .price(currency.getPrice())
-                        .build())
-                .collect(Collectors.toList());*/
-        return null;
+    }
+
+    public Currency currencyConverter(UserCurrency userCurrency) {
+        Currency c = userCurrency.getCurrency();
+        if (userCurrency.isFavorite()) {
+            BigDecimal value = c.getPrice().multiply(BigDecimal.valueOf(0.57));
+            c.setPrice(value);
+        }
+        return c;
     }
 
     @Override
     @Transactional
-    public void addCurrency(CurrencyDTO currencyDTO) {
-        String username = SessionJwt.loggedUsername();
+    public void addCurrency(CurrencyDTO currencyDTO) throws CurrencyNotFound {
 
-        Currency currency = jpaCurrencyRepository.findByApiIdentifier(currencyDTO.getAssetId()).orElseGet(() -> {
-            ContentGenericWrapper<AssetTickerResponse> response = bncService.getToAssetTicker(currencyDTO.getAssetId(), false);
-            BigDecimal price = response.getContent()
-                    .stream()
-                    .findFirst()
-                    .map(AssetTickerResponse::getPrice)
-                    .orElse(BigDecimal.ZERO);
-            AssetDTO.AssetResponseDTO assetFromApi = bncService.getToAssetById(currencyDTO.getAssetId());
-            return new Currency().setType(assetFromApi.getType())
-                    .setStatus(assetFromApi.getStatus())
-                    .setSymbol(assetFromApi.getSymbol())
-                    .setName(assetFromApi.getName())
-                    .setPrice(price)
-                    .setApiIdentifier(assetFromApi.getId());
-        });
-        Optional<User> user = jpaUserRepository.findByUsername(username);
-        user.ifPresent(value -> value.addCurrency(currency, false));
+        Optional<Currency> currency = jpaCurrencyRepository.findByAssetId(currencyDTO);
+        if (currency.isPresent()) {
+            addAndStoreCurrencyToUser(currency.get());
+            return;
+        }
+        AssetDTO.AssetResponseDTO responseDTO = bncService.getToAssetById(currencyDTO.getAssetId());
+        BigDecimal price = bncService.getToAssetTicker(responseDTO.getId(), false)
+                .getContent()
+                .stream()
+                .map(AssetTickerResponse::getPrice)
+                .findFirst()
+                .orElse(BigDecimal.ZERO);
+
+        if (responseDTO.getId() == null) {
+            throw new CurrencyNotFound("Currency not found");
+        }
+        Currency currencyFromApi = responseDTO.mapToEntity().setPrice(price);
+        addAndStoreCurrencyToUser(currencyFromApi);
+
     }
+
+    public void addAndStoreCurrencyToUser(Currency currency) {
+        Optional<User> usrInDb = jpaUserRepository.findByUsername(SessionJwt.loggedUsername());
+        if (usrInDb.isPresent()) {
+            User user = usrInDb.get();
+            jpaCurrencyRepository.save(currency);
+            user.addCurrency(currency, false);
+            jpaUserRepository.save(user);
+        }
+    }
+
 }
 

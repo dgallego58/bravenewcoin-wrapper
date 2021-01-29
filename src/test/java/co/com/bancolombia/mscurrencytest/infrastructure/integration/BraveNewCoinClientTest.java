@@ -1,6 +1,9 @@
-package co.com.bancolombia.mscurrencytest.infrastructure.client;
+package co.com.bancolombia.mscurrencytest.infrastructure.integration;
 
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.*;
+import co.com.bancolombia.mscurrencytest.infrastructure.client.BNCService;
+import co.com.bancolombia.mscurrencytest.infrastructure.client.BraveNewCoinClient;
+import co.com.bancolombia.mscurrencytest.infrastructure.client.dto.*;
+import co.com.bancolombia.mscurrencytest.mocks.DefaultAnswers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -18,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @Disabled
-class BraveNewCoinClientTest {
+class BraveNewCoinClientTest extends DefaultAnswers {
 
     @Autowired
     RestTemplate restTemplate;
@@ -66,7 +69,10 @@ class BraveNewCoinClientTest {
     void getToAssetOrMarketIdTest() {
         ContentGenericWrapper<AssetDTO.AssetResponseDTO> asset = bncService.getToAsset(createAssetRequest());
         ContentGenericWrapper<MarketDTO.MarketResponseDTO> market = bncService.getToMarket(marketRequestDTO());
-        AssetDTO.AssetResponseDTO assetResponseDTO = asset.getContent().get(0);
+        AssetDTO.AssetResponseDTO assetResponseDTO = asset.getContent()
+                .stream()
+                .findFirst()
+                .orElse(mockAssetResponse().getContent().get(0));
         MarketDTO.MarketResponseDTO marketResponseDTO = market.getContent().get(0);
 
         AssetDTO.AssetResponseDTO assetById = bncService.getToAssetById(assetResponseDTO.getId());
@@ -82,11 +88,7 @@ class BraveNewCoinClientTest {
     @Test
     void getToAssetTickerTest() {
         ContentGenericWrapper<AssetDTO.AssetResponseDTO> asset = bncService.getToAsset(createAssetRequest());
-        String assetId = asset.getContent()
-                .stream()
-                .findFirst()
-                .map(AssetDTO.AssetResponseDTO::getId)
-                .orElseThrow(NullPointerException::new);
+        String assetId = asset.getContent().stream().findFirst().map(AssetDTO.AssetResponseDTO::getId).orElse("");
         ContentGenericWrapper<AssetTickerResponse> assetTickerResponseWithPercent = bncService.getToAssetTicker(assetId, true);
         ContentGenericWrapper<AssetTickerResponse> assetTickerResponseNoPercent = bncService.getToAssetTicker(assetId, false);
         System.out.println(assetTickerResponseWithPercent);
@@ -139,12 +141,5 @@ class BraveNewCoinClientTest {
 
     }
 
-    private AssetDTO.AssetRequestDTO createAssetRequest() {
-        return AssetDTO.AssetRequestDTO.builder().status(AssetDTO.AssetStatus.ACTIVE).symbol("COP").type("FIAT")
-                .build();
-    }
 
-    private MarketDTO marketRequestDTO() {
-        return MarketDTO.builder().baseAssetId(null).quoteAssetId(null).build();
-    }
 }

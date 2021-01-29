@@ -1,5 +1,6 @@
 package co.com.bancolombia.mscurrencytest.infrastructure.controller;
 
+import co.com.bancolombia.mscurrencytest.domain.exception.CurrencyNotFound;
 import co.com.bancolombia.mscurrencytest.domain.model.dto.CurrencyDTO;
 import co.com.bancolombia.mscurrencytest.infrastructure.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +28,21 @@ public class CurrencyController {
     }
 
     @PostMapping(path = "/addCoin", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> addCurrency(@RequestBody @Valid CurrencyDTO currencyDTO) {
+    public ResponseEntity<Void> addCurrency(@RequestBody @Valid CurrencyDTO currencyDTO) throws CurrencyNotFound {
+
         currencyService.addCurrency(currencyDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/addCoin")
                 .buildAndExpand("/currency/user")
                 .toUri();
         return ResponseEntity.created(location).build();
+
+
+    }
+
+    @GetMapping(path = "/getTop3")
+    public ResponseEntity<List<CurrencyDTO>> getTop3(@RequestParam boolean reversed) {
+        return ResponseEntity.ok(currencyService.getTop3(reversed));
     }
 
 }

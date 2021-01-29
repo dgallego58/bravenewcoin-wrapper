@@ -15,9 +15,6 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        //these lines just in case there are roles
-        // SimpleGrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getRole().name());
-        //return List.of(grantedAuthority);
         return List.of();
     }
 
@@ -48,6 +45,6 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.isActive();
+        return true;
     }
 }

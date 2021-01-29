@@ -1,64 +1,51 @@
 package co.com.bancolombia.mscurrencytest.domain.model.entities;
 
 import co.com.bancolombia.mscurrencytest.domain.model.constants.DatabaseNames;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.NaturalIdCache;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@NaturalIdCache
-@Table(name = "user", schema = DatabaseNames.MAIN_SCHEMA)
-public class User {
+@Table(name = "users", schema = DatabaseNames.MANAGER_SCHEMA)
+public class User implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "usr_seq")
-    @SequenceGenerator(name = "usr_seq", allocationSize = 5)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @NaturalId
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(name = "username")
     private String username;
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
 
-    @Column(name = "firstname", nullable = false)
+    @Column(name = "firstname")
     private String firstname;
-    @Column(name = "lastname", nullable = false)
+    @Column(name = "lastname")
     private String lastname;
 
-    private boolean active;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserCurrency> userCurrencies = new ArrayList<>();
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public User setActive(boolean active) {
-        this.active = active;
-        return this;
-    }
 
     public void addCurrency(Currency currency, boolean favorite) {
-
         UserCurrency userCurrency = new UserCurrency(this, currency, favorite);
-        this.getUserCurrencies().add(userCurrency);
+        userCurrencies.add(userCurrency);
     }
 
     public void removeCurrency(Currency currency) {
         for (UserCurrency userCurrency : this.getUserCurrencies()) {
             if (userCurrency.getUser().equals(this) && userCurrency.getCurrency().equals(currency)) {
-                userCurrency.setUser(null).setUser(null);
+                userCurrency.setUser(null).setCurrency(null);
                 this.getUserCurrencies().remove(userCurrency);
             }
         }
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -67,13 +54,13 @@ public class User {
         if (o == null || getClass() != o.getClass())
             return false;
         User user = (User) o;
-        return active == user.active && username.equals(user.username) && password.equals(user.password) && firstname.equals(user.firstname) && lastname
-                .equals(user.lastname);
+        return Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(firstname, user.firstname) && Objects
+                .equals(lastname, user.lastname);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, password, firstname, lastname, active);
+        return Objects.hash(username, password, firstname, lastname);
     }
 
     public List<UserCurrency> getUserCurrencies() {
@@ -85,11 +72,11 @@ public class User {
         return this;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public User setId(Integer id) {
+    public User setId(Long id) {
         this.id = id;
         return this;
     }

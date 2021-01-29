@@ -1,7 +1,7 @@
 package co.com.bancolombia.mscurrencytest.infrastructure.client;
 
 import co.com.bancolombia.mscurrencytest.infrastructure.client.constants.ClientConstants;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.*;
+import co.com.bancolombia.mscurrencytest.infrastructure.client.dto.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface BNCService {
 
-    String baseUrl = "https://bravenewcoin.p.rapidapi.com/";
+    String BNC_URL = "https://bravenewcoin.p.rapidapi.com/";
 
     default HttpHeaders defaultHeader() {
         HttpHeaders httpHeaders = new HttpHeaders();

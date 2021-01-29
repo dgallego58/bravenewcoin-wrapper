@@ -1,6 +1,6 @@
 package co.com.bancolombia.mscurrencytest.infrastructure.client;
 
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.*;
+import co.com.bancolombia.mscurrencytest.infrastructure.client.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -24,7 +24,7 @@ public class BraveNewCoinClient implements BNCService {
 
         HttpHeaders httpHeaders = defaultHeader();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        RequestEntity<BNCTokenDTO.RequestGetTokenDTO> requestToken = RequestEntity.post(URI.create(baseUrl + "oauth/token"))
+        RequestEntity<BNCTokenDTO.RequestGetTokenDTO> requestToken = RequestEntity.post(URI.create(BNC_URL + "oauth/token"))
                 .headers(httpHeaders)
                 .body(requestGetTokenDTO);
 
@@ -35,7 +35,7 @@ public class BraveNewCoinClient implements BNCService {
 
     @Override
     public AssetDTO.AssetResponseDTO getToAssetById(String assetId) {
-        String uri = baseUrl.concat(String.format("%s/%s", LookUp.ASSET.getValue(), assetId));
+        String uri = BNC_URL.concat(String.format("%s/%s", LookUp.ASSET.getValue(), assetId));
         RequestEntity<Void> request = RequestEntity.get(URI.create(uri)).headers(defaultHeader()).build();
         ParameterizedTypeReference<AssetDTO.AssetResponseDTO> typeReference = new ParameterizedTypeReference<>() {
         };
@@ -46,7 +46,7 @@ public class BraveNewCoinClient implements BNCService {
 
     @Override
     public MarketDTO.MarketResponseDTO getToMarketById(String marketId) {
-        String uri = baseUrl.concat(String.format("%s/%s", LookUp.MARKET.getValue(), marketId));
+        String uri = BNC_URL.concat(String.format("%s/%s", LookUp.MARKET.getValue(), marketId));
         RequestEntity<Void> request = RequestEntity.get(URI.create(uri)).headers(defaultHeader()).build();
         ParameterizedTypeReference<MarketDTO.MarketResponseDTO> typeReference = new ParameterizedTypeReference<>() {
         };
@@ -57,7 +57,7 @@ public class BraveNewCoinClient implements BNCService {
 
     @Override
     public ContentGenericWrapper<MarketDTO.MarketResponseDTO> getToMarket(MarketDTO request) {
-        String uri = baseUrl.concat(String.format("%s", LookUp.MARKET.getValue()));
+        String uri = BNC_URL.concat(String.format("%s", LookUp.MARKET.getValue()));
         UriComponentsBuilder uriComponents = UriComponentsBuilder.fromHttpUrl(uri);
         if (request.getBaseAssetId() != null && !request.getBaseAssetId().isBlank()) {
             uriComponents.queryParam("baseAssetId", request.getBaseAssetId());
@@ -76,7 +76,7 @@ public class BraveNewCoinClient implements BNCService {
 
     @Override
     public ContentGenericWrapper<AssetDTO.AssetResponseDTO> getToAsset(AssetDTO.AssetRequestDTO request) {
-        String uri = baseUrl.concat(String.format("%s", LookUp.ASSET.getValue()));
+        String uri = BNC_URL.concat(String.format("%s", LookUp.ASSET.getValue()));
 
         UriComponentsBuilder uriComponents = UriComponentsBuilder.fromHttpUrl(uri);
 
@@ -91,7 +91,6 @@ public class BraveNewCoinClient implements BNCService {
         }
         ParameterizedTypeReference<ContentGenericWrapper<AssetDTO.AssetResponseDTO>> typeReference = new ParameterizedTypeReference<>() {
         };
-        System.out.println("uri req: " + uriComponents.build().toUri());
         RequestEntity<Void> requestEntity = RequestEntity.get(uriComponents.build().toUri())
                 .headers(defaultHeader())
                 .build();
@@ -101,7 +100,7 @@ public class BraveNewCoinClient implements BNCService {
 
     @Override
     public ContentGenericWrapper<AssetTickerResponse> getToAssetTicker(String assetId, boolean withPercentChange) {
-        String uri = baseUrl.concat(String.format("%s", "market-cap"));
+        String uri = BNC_URL.concat(String.format("%s", "market-cap"));
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(uri)
                 .queryParam("assetId", assetId)
                 .queryParam("percentChange", withPercentChange);

@@ -1,5 +1,6 @@
-package co.com.bancolombia.mscurrencytest.infrastructure.client.dtos;
+package co.com.bancolombia.mscurrencytest.infrastructure.client.dto;
 
+import co.com.bancolombia.mscurrencytest.domain.model.entities.Currency;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -50,6 +51,14 @@ public class AssetDTO {
         String status;
         String type;
         String url;
+
+        public Currency mapToEntity() {
+            return new Currency().setAssetId(this.id)
+                    .setStatus(this.status)
+                    .setSymbol(this.symbol)
+                    .setType(this.type)
+                    .setName(this.name);
+        }
     }
 
 }

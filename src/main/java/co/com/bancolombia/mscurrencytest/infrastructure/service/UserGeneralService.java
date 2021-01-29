@@ -5,9 +5,9 @@ import co.com.bancolombia.mscurrencytest.domain.model.dto.UserDTO;
 import co.com.bancolombia.mscurrencytest.domain.model.entities.Currency;
 import co.com.bancolombia.mscurrencytest.domain.model.entities.User;
 import co.com.bancolombia.mscurrencytest.infrastructure.client.BNCService;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.AssetDTO;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.AssetTickerResponse;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.ContentGenericWrapper;
+import co.com.bancolombia.mscurrencytest.infrastructure.client.dto.AssetDTO;
+import co.com.bancolombia.mscurrencytest.infrastructure.client.dto.AssetTickerResponse;
+import co.com.bancolombia.mscurrencytest.infrastructure.client.dto.ContentGenericWrapper;
 import co.com.bancolombia.mscurrencytest.infrastructure.config.security.UserDetailsImpl;
 import co.com.bancolombia.mscurrencytest.infrastructure.repository.JpaUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,27 +34,21 @@ public class UserGeneralService implements IUserGeneralService {
         ContentGenericWrapper<AssetDTO.AssetResponseDTO> assets = bncService.getToAsset(AssetDTO.AssetRequestDTO.builder()
                 .symbol(userDTO.getFavoriteCurrencySymbol())
                 .build());
-        AssetDTO.AssetResponseDTO assetResponseDTO = assets.getContent()
+        Currency currency = assets.getContent()
                 .stream()
                 .findFirst()
+                .map(AssetDTO.AssetResponseDTO::mapToEntity)
                 .orElseThrow(() -> new CurrencyNotFound("Coin not found"));
-        ContentGenericWrapper<AssetTickerResponse> assetTickerResponse = bncService.getToAssetTicker(assetResponseDTO.getId(), true);
+        ContentGenericWrapper<AssetTickerResponse> assetTickerResponse = bncService.getToAssetTicker(currency.getAssetId(), true);
+
         BigDecimal price = assetTickerResponse.getContent()
                 .stream()
                 .findFirst()
                 .map(AssetTickerResponse::getPrice)
                 .orElse(BigDecimal.ZERO);
+        currency.setPrice(price);
 
-        Currency currency = new Currency().setName(assetResponseDTO.getName())
-                .setType(assetResponseDTO.getType())
-                .setPrice(price)
-                .setSymbol(assetResponseDTO.getSymbol())
-                .setStatus(assetResponseDTO.getStatus())
-                .setApiIdentifier(assetResponseDTO.getId());
-
-        User user = new User().setUsername(userDTO.getUsername())
-                .setActive(true)
-                .setFirstname(userDTO.getFirstname())
+        User user = new User().setUsername(userDTO.getUsername()).setFirstname(userDTO.getFirstname())
                 .setLastname(userDTO.getLastname())
                 .setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.addCurrency(currency, true);
@@ -63,13 +57,11 @@ public class UserGeneralService implements IUserGeneralService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
         return jpaUserRepository.findByUsername(username)
                 .map(UserDetailsImpl::new)
                 .orElseThrow(() -> new UsernameNotFoundException("Couldn't find user"));
     }
-
-
 
 
 }

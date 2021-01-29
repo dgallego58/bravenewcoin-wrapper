@@ -1,4 +1,4 @@
-package co.com.bancolombia.mscurrencytest.infrastructure.client.dtos;
+package co.com.bancolombia.mscurrencytest.infrastructure.client.dto;
 
 public class MarketCapPC extends AbstractPercentChange {
 

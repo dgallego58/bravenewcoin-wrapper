@@ -12,6 +12,10 @@ import java.util.Map;
 
 public final class Converter {
 
+    private Converter() {
+        //sonar
+    }
+
     public static ObjectMapper configuredObjectMapper() {
         return new ObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .registerModules(new JavaTimeModule(), new Jdk8Module());

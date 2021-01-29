@@ -5,10 +5,11 @@ import co.com.bancolombia.mscurrencytest.infrastructure.config.security.UserDeta
 import co.com.bancolombia.mscurrencytest.infrastructure.utils.Converter;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -24,6 +25,7 @@ import java.util.Map;
 import static co.com.bancolombia.mscurrencytest.infrastructure.config.security.SecurityConstants.EXPIRATION_TIME;
 import static co.com.bancolombia.mscurrencytest.infrastructure.config.security.SecurityConstants.SECRET;
 
+@Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
@@ -33,14 +35,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
         try {
             User credentials = Converter.configuredObjectMapper().readValue(request.getInputStream(), User.class);
             String username = credentials.getUsername();
             String password = credentials.getPassword();
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password, List.of()));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("Cannot authenticate {}", e.getMessage());
+            throw new BadCredentialsException("cannot authenticate");
         }
     }
 

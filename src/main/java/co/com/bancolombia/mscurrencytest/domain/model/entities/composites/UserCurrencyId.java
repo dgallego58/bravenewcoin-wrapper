@@ -8,14 +8,14 @@ import java.util.Objects;
 @Embeddable
 public class UserCurrencyId implements Serializable {
 
-    private Integer userId;
-    private Integer currencyId;
+    private Long userId;
+    private Long currencyId;
 
     public UserCurrencyId() {
         //jpa stuff
     }
 
-    public UserCurrencyId(Integer userId, Integer currencyId) {
+    public UserCurrencyId(Long userId, Long currencyId) {
         this.userId = userId;
         this.currencyId = currencyId;
     }
@@ -27,7 +27,7 @@ public class UserCurrencyId implements Serializable {
         if (o == null || getClass() != o.getClass())
             return false;
         UserCurrencyId that = (UserCurrencyId) o;
-        return userId.equals(that.userId) && currencyId.equals(that.currencyId);
+        return Objects.equals(userId, that.userId) && Objects.equals(currencyId, that.currencyId);
     }
 
     @Override
@@ -35,20 +35,20 @@ public class UserCurrencyId implements Serializable {
         return Objects.hash(userId, currencyId);
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public UserCurrencyId setUserId(Integer userId) {
+    public UserCurrencyId setUserId(Long userId) {
         this.userId = userId;
         return this;
     }
 
-    public Integer getCurrencyId() {
+    public Long getCurrencyId() {
         return currencyId;
     }
 
-    public UserCurrencyId setCurrencyId(Integer currencyId) {
+    public UserCurrencyId setCurrencyId(Long currencyId) {
         this.currencyId = currencyId;
         return this;
     }

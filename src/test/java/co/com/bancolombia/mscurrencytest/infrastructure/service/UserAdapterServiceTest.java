@@ -3,49 +3,52 @@ package co.com.bancolombia.mscurrencytest.infrastructure.service;
 import co.com.bancolombia.mscurrencytest.domain.exception.CurrencyNotFound;
 import co.com.bancolombia.mscurrencytest.domain.model.dto.UserDTO;
 import co.com.bancolombia.mscurrencytest.infrastructure.client.BNCService;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.AssetDTO;
-import co.com.bancolombia.mscurrencytest.infrastructure.client.dtos.ContentGenericWrapper;
 import co.com.bancolombia.mscurrencytest.infrastructure.repository.JpaCurrencyRepository;
 import co.com.bancolombia.mscurrencytest.infrastructure.repository.JpaUserRepository;
 import co.com.bancolombia.mscurrencytest.infrastructure.utils.Converter;
+import co.com.bancolombia.mscurrencytest.mocks.DefaultAnswers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
-class UserAdapterServiceTest {
+class UserAdapterServiceTest extends DefaultAnswers {
 
     @MockBean
     JpaUserRepository jpaUserRepository;
     @MockBean
     PasswordEncoder passwordEncoder;
-
-    IUserGeneralService userRepository;
     @MockBean
     JpaCurrencyRepository jpaCurrencyRepository;
-
     @MockBean
     BNCService bncService;
 
+    IUserGeneralService iUserGeneralService;
+
     @BeforeEach
     void setUp() {
-        userRepository = new UserGeneralService(jpaUserRepository, passwordEncoder, bncService);
+        iUserGeneralService = new UserGeneralService(jpaUserRepository, passwordEncoder, bncService);
     }
 
     @Test
     void saveUser() throws JsonProcessingException, CurrencyNotFound {
 
 
-        Mockito.when(bncService.getToAsset(Mockito.any())).thenReturn(mockAnswer());
-        Mockito.when(bncService.getToAssetById(Mockito.any()))
-                .thenReturn(mockAnswer().getContent().stream().findFirst().orElse(null));
+        Mockito.when(bncService.getToAsset(Mockito.any())).thenReturn(mockAssetResponse());
+        Mockito.when(bncService.getToAssetTicker(Mockito.anyString(), Mockito.anyBoolean()))
+                .thenReturn(mockTickerAnswer());
 
         UserDTO userDTO = UserDTO.builder()
                 .password("testpass")
@@ -56,16 +59,24 @@ class UserAdapterServiceTest {
                 .build();
 
         System.out.printf("REQUEST JSON: %s", Converter.configuredObjectMapper().writeValueAsString(userDTO));
-
-        userRepository.saveUser(userDTO);
-
+        iUserGeneralService.saveUser(userDTO);
         Mockito.verify(jpaUserRepository, Mockito.times(1)).save(Mockito.any());
-        Mockito.verify(jpaCurrencyRepository, Mockito.times(1)).save(Mockito.any());
+        //Mockito.verify(jpaCurrencyRepository, Mockito.times(1)).save(Mockito.any());
     }
 
-    private ContentGenericWrapper<AssetDTO.AssetResponseDTO> mockAnswer() {
-        AssetDTO.AssetResponseDTO assetResponseDTO = new AssetDTO.AssetResponseDTO("123", "Colombian Peso", "COP", "ACTIVE", "CRYPTO", "not prov");
+    @Test
+    void whenLoadUserByUsernameShouldBeOk() {
 
-        return new ContentGenericWrapper<>(List.of(assetResponseDTO));
+        Mockito.when(jpaUserRepository.findByUsername(Mockito.anyString())).thenReturn(Optional.of(defaultUser()));
+        UserDetails userDetails = iUserGeneralService.loadUserByUsername("testusrname");
+        assertEquals("testusrname", userDetails.getUsername());
     }
+
+    @Test
+    void whenLoadUserByUsernameShouldThrowUsernotfound() {
+        Mockito.when(jpaUserRepository.findByUsername(Mockito.anyString())).thenThrow(UsernameNotFoundException.class);
+        assertThrows(UsernameNotFoundException.class, () -> iUserGeneralService.loadUserByUsername("testusrname"));
+    }
+
+
 }
