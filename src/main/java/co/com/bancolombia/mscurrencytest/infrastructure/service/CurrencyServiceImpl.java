@@ -66,7 +66,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     @Transactional
     public void addCurrency(CurrencyDTO currencyDTO) throws CurrencyNotFound {
 
-        Optional<Currency> currency = jpaCurrencyRepository.findByAssetId(currencyDTO);
+        Optional<Currency> currency = jpaCurrencyRepository.findByCurrencyDto(currencyDTO);
         if (currency.isPresent()) {
             addAndStoreCurrencyToUser(currency.get());
             return;

@@ -12,10 +12,9 @@ import java.util.Optional;
 @Repository
 public interface JpaCurrencyRepository extends JpaRepository<Currency, Integer> {
 
-    Optional<Currency> findByAssetId(String apiIdentifier);
 
-    @Query("select distinct c from Currency c" + " where" + " c.name like %:#{#currencyDTO.getName()}% or" + " c.symbol like :#{#currencyDTO.getSymbol()} or" + " c.type like :#{#currencyDTO.getType()} or " + " c.assetId like :#{#currencyDTO.getAssetId()}")
-    Optional<Currency> findByAssetId(@Param("currencyDTO") CurrencyDTO currencyDTO);
+    @Query("select distinct c from Currency c where" + " c.name like %:#{#currencyDTO.getName()}% or" + " c.symbol like :#{#currencyDTO.getSymbol()} or" + " c.type like :#{#currencyDTO.getType()} or " + " c.assetId like :#{#currencyDTO.getAssetId()}")
+    Optional<Currency> findByCurrencyDto(@Param("currencyDTO") CurrencyDTO currencyDTO);
 
 
 }

@@ -35,21 +35,41 @@ class UserAdapterServiceTest extends DefaultAnswers {
     @MockBean
     BNCService bncService;
 
+
     IUserGeneralService iUserGeneralService;
 
     @BeforeEach
     void setUp() {
-        iUserGeneralService = new UserGeneralService(jpaUserRepository, passwordEncoder, bncService);
+        iUserGeneralService = new UserGeneralService(jpaUserRepository, passwordEncoder, bncService, jpaCurrencyRepository);
     }
 
     @Test
-    void saveUser() throws JsonProcessingException, CurrencyNotFound {
+    void saveUserShouldCallApi() throws JsonProcessingException, CurrencyNotFound {
 
-
+        Mockito.when(jpaCurrencyRepository.findByCurrencyDto(Mockito.any())).thenReturn(Optional.empty());
         Mockito.when(bncService.getToAsset(Mockito.any())).thenReturn(mockAssetResponse());
         Mockito.when(bncService.getToAssetTicker(Mockito.anyString(), Mockito.anyBoolean()))
                 .thenReturn(mockTickerAnswer());
 
+        UserDTO userDTO = UserDTO.builder()
+                .password("testpass")
+                .username("testusr")
+                .firstname("test firstname")
+                .lastname("test lastname")
+                .favoriteCurrencySymbol("COP")
+                .build();
+
+        System.out.printf("REQUEST JSON: %s", Converter.configuredObjectMapper().writeValueAsString(userDTO));
+        iUserGeneralService.saveUser(userDTO);
+        Mockito.verify(jpaUserRepository, Mockito.times(1)).save(Mockito.any());
+        //Mockito.verify(jpaCurrencyRepository, Mockito.times(1)).save(Mockito.any());
+    }
+
+    @Test
+    void saveUserShouldCallDb() throws JsonProcessingException, CurrencyNotFound {
+
+        Mockito.when(jpaCurrencyRepository.findByCurrencyDto(Mockito.any()))
+                .thenReturn(Optional.of(mockCurrencies().get(0)));
         UserDTO userDTO = UserDTO.builder()
                 .password("testpass")
                 .username("testusr")

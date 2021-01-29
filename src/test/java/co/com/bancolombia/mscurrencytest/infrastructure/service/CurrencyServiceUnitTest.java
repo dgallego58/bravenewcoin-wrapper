@@ -70,7 +70,7 @@ class CurrencyServiceUnitTest extends DefaultAnswers {
 
     @Test
     void testAddCurrencyShouldCallOnlyBd() throws CurrencyNotFound {
-        when(jpaCurrencyRepository.findByAssetId(any(CurrencyDTO.class))).thenReturn(mockCurrencies().stream()
+        when(jpaCurrencyRepository.findByCurrencyDto(any(CurrencyDTO.class))).thenReturn(mockCurrencies().stream()
                 .findFirst());
         when(jpaUserRepository.findByUsername(anyString())).thenReturn(Optional.of(defaultUser()));
         currencyService.addCurrency(mockBitCoinCurrencyDto());
@@ -80,7 +80,7 @@ class CurrencyServiceUnitTest extends DefaultAnswers {
 
     @Test
     void testAddCurrencyShouldCallApiBnc() throws CurrencyNotFound {
-        when(jpaCurrencyRepository.findByAssetId(anyString())).thenReturn(Optional.empty());
+        when(jpaCurrencyRepository.findByCurrencyDto(any())).thenReturn(Optional.empty());
         when(bncService.getToAssetTicker(anyString(), Mockito.anyBoolean())).thenReturn(mockTickerAnswer());
         when(bncService.getToAssetById(anyString())).thenReturn(mockAssetResponse().getContent().get(0));
         when(jpaUserRepository.findByUsername(anyString())).thenReturn(Optional.of(defaultUser()));
