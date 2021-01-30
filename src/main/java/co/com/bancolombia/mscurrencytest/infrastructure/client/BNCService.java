@@ -2,24 +2,11 @@ package co.com.bancolombia.mscurrencytest.infrastructure.client;
 
 import co.com.bancolombia.mscurrencytest.infrastructure.client.constants.ClientConstants;
 import co.com.bancolombia.mscurrencytest.infrastructure.client.dto.*;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-
-import java.util.List;
 
 public interface BNCService {
 
     String BNC_URL = "https://bravenewcoin.p.rapidapi.com/";
 
-    default HttpHeaders defaultHeader() {
-        HttpHeaders httpHeaders = new HttpHeaders();
-
-        httpHeaders.add(ClientConstants.RAPID_API_KEY_HEADER_NAME, ClientConstants.RAPID_API_KEY_HEADER_VALUE);
-        httpHeaders.add(ClientConstants.RAPID_API_HOST_HEADER_NAME, ClientConstants.RAPID_API_HOST_HEADER_VALUE);
-        httpHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
-
-        return httpHeaders;
-    }
 
     default BNCTokenDTO.RequestGetTokenDTO defaultTokenDto() {
         return BNCTokenDTO.RequestGetTokenDTO.builder()

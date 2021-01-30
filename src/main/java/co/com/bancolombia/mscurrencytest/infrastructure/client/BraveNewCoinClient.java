@@ -3,8 +3,6 @@ package co.com.bancolombia.mscurrencytest.infrastructure.client;
 import co.com.bancolombia.mscurrencytest.infrastructure.client.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,21 +20,18 @@ public class BraveNewCoinClient implements BNCService {
     @Override
     public BNCTokenDTO.ResponseGetTokenDTO getToken(BNCTokenDTO.RequestGetTokenDTO requestGetTokenDTO) {
 
-        HttpHeaders httpHeaders = defaultHeader();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+
         RequestEntity<BNCTokenDTO.RequestGetTokenDTO> requestToken = RequestEntity.post(URI.create(BNC_URL + "oauth/token"))
-                .headers(httpHeaders)
                 .body(requestGetTokenDTO);
 
         ResponseEntity<BNCTokenDTO.ResponseGetTokenDTO> response = restTemplate.exchange(requestToken, BNCTokenDTO.ResponseGetTokenDTO.class);
-
         return response.getBody();
     }
 
     @Override
     public AssetDTO.AssetResponseDTO getToAssetById(String assetId) {
         String uri = BNC_URL.concat(String.format("%s/%s", LookUp.ASSET.getValue(), assetId));
-        RequestEntity<Void> request = RequestEntity.get(URI.create(uri)).headers(defaultHeader()).build();
+        RequestEntity<Void> request = RequestEntity.get(URI.create(uri)).build();
         ParameterizedTypeReference<AssetDTO.AssetResponseDTO> typeReference = new ParameterizedTypeReference<>() {
         };
         ResponseEntity<AssetDTO.AssetResponseDTO> response = restTemplate.exchange(request, typeReference);
@@ -47,7 +42,7 @@ public class BraveNewCoinClient implements BNCService {
     @Override
     public MarketDTO.MarketResponseDTO getToMarketById(String marketId) {
         String uri = BNC_URL.concat(String.format("%s/%s", LookUp.MARKET.getValue(), marketId));
-        RequestEntity<Void> request = RequestEntity.get(URI.create(uri)).headers(defaultHeader()).build();
+        RequestEntity<Void> request = RequestEntity.get(URI.create(uri)).build();
         ParameterizedTypeReference<MarketDTO.MarketResponseDTO> typeReference = new ParameterizedTypeReference<>() {
         };
         ResponseEntity<MarketDTO.MarketResponseDTO> response = restTemplate.exchange(request, typeReference);
@@ -65,9 +60,7 @@ public class BraveNewCoinClient implements BNCService {
         if (request.getQuoteAssetId() != null && !request.getQuoteAssetId().isBlank()) {
             uriComponents.queryParam("quoteAssetId", request.getQuoteAssetId());
         }
-        RequestEntity<Void> requestEntity = RequestEntity.get(uriComponents.build().toUri())
-                .headers(defaultHeader())
-                .build();
+        RequestEntity<Void> requestEntity = RequestEntity.get(uriComponents.build().toUri()).build();
         ParameterizedTypeReference<ContentGenericWrapper<MarketDTO.MarketResponseDTO>> typeReference = new ParameterizedTypeReference<>() {
         };
         ResponseEntity<ContentGenericWrapper<MarketDTO.MarketResponseDTO>> response = restTemplate.exchange(requestEntity, typeReference);
@@ -91,9 +84,8 @@ public class BraveNewCoinClient implements BNCService {
         }
         ParameterizedTypeReference<ContentGenericWrapper<AssetDTO.AssetResponseDTO>> typeReference = new ParameterizedTypeReference<>() {
         };
-        RequestEntity<Void> requestEntity = RequestEntity.get(uriComponents.build().toUri())
-                .headers(defaultHeader())
-                .build();
+        RequestEntity<Void> requestEntity = RequestEntity.get(uriComponents.build().toUri()).build();
+
         ResponseEntity<ContentGenericWrapper<AssetDTO.AssetResponseDTO>> response = restTemplate.exchange(requestEntity, typeReference);
         return response.getBody();
     }
@@ -104,11 +96,12 @@ public class BraveNewCoinClient implements BNCService {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(uri)
                 .queryParam("assetId", assetId)
                 .queryParam("percentChange", withPercentChange);
-        HttpHeaders httpHeaders = defaultHeader();
-        httpHeaders.setBearerAuth(getToken(defaultTokenDto()).getAccessToken());
+
         ParameterizedTypeReference<ContentGenericWrapper<AssetTickerResponse>> typeReference = new ParameterizedTypeReference<>() {
         };
-        RequestEntity<Void> request = RequestEntity.get(uriBuilder.build().toUri()).headers(httpHeaders).build();
+        RequestEntity<Void> request = RequestEntity.get(uriBuilder.build().toUri())
+                .headers(h -> h.setBearerAuth(getToken(defaultTokenDto()).getAccessToken()))
+                .build();
         ResponseEntity<ContentGenericWrapper<AssetTickerResponse>> response = restTemplate.exchange(request, typeReference);
 
         return response.getBody();

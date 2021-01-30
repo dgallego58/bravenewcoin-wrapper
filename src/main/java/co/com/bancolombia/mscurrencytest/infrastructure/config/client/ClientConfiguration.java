@@ -22,15 +22,12 @@ public class ClientConfiguration {
 
     @Bean
     public RestTemplate restTemplate() {
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setMessageConverters(List.of(new MappingJackson2HttpMessageConverter(Converter.configuredObjectMapper())));
-
-        RestTemplateBuilder builder = new RestTemplateBuilder();
-        builder.errorHandler(responseErrorHandler);
-        builder.configure(restTemplate);
-        builder.setConnectTimeout(Duration.ofSeconds(15));
-        builder.setReadTimeout(Duration.ofSeconds(15));
-        return builder.build();
+        return new RestTemplateBuilder().errorHandler(responseErrorHandler)
+                .setConnectTimeout(Duration.ofSeconds(15))
+                .setReadTimeout(Duration.ofSeconds(15))
+                .additionalInterceptors(new RestClientInterceptor())
+                .messageConverters(List.of(new MappingJackson2HttpMessageConverter(Converter.configuredObjectMapper())))
+                .build();
     }
 
 
