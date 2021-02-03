@@ -49,6 +49,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 .verify(token.split(" ")[1]);
         String username = jwt.getSubject();
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails == null ? List.of() : userDetails.getAuthorities());
     }
 
