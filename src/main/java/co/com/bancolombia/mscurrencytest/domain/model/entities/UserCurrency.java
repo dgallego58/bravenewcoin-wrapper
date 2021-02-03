@@ -59,24 +59,13 @@ public class UserCurrency implements Serializable {
         return userCurrencyId;
     }
 
-
-    public User getUser() {
-        return user;
-    }
-
-
-    public Currency getCurrency() {
-        return currency;
-    }
-
-
-    public boolean isFavorite() {
-        return favorite;
-    }
-
     public UserCurrency setUserCurrencyId(UserCurrencyId userCurrencyId) {
         this.userCurrencyId = userCurrencyId;
         return this;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public UserCurrency setUser(User user) {
@@ -84,9 +73,17 @@ public class UserCurrency implements Serializable {
         return this;
     }
 
+    public Currency getCurrency() {
+        return currency;
+    }
+
     public UserCurrency setCurrency(Currency currency) {
         this.currency = currency;
         return this;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
     }
 
     public UserCurrency setFavorite(boolean favorite) {

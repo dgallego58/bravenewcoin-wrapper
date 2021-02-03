@@ -1,7 +1,9 @@
 package co.com.bancolombia.mscurrencytest.domain.model.entities;
 
 import co.com.bancolombia.mscurrencytest.domain.model.constants.DatabaseNames;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,6 +12,8 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
+@NaturalIdCache
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "users", schema = DatabaseNames.MANAGER_SCHEMA)
 public class User implements Serializable {
 
